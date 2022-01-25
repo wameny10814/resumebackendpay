@@ -18,12 +18,18 @@ class Person {
     }
 }
 
+const f3 = a => a*a*a;
+
+module.exports = Person;
+
+/*
 const p1 = new Person('Bill', 23);
 
 
 console.log(p1.sayHello());
 console.log(JSON.stringify(p1.toJSON()));
 console.log(JSON.stringify(p1));
+*/
 
 
 
