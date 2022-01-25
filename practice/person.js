@@ -18,9 +18,11 @@ class Person {
     }
 }
 
+console.log('person.js');
+
 const f3 = a => a*a*a;
 
-module.exports = Person;
+module.exports = {Person, f3};
 
 /*
 const p1 = new Person('Bill', 23);
