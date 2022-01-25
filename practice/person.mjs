@@ -21,7 +21,9 @@ class Person {
 console.log('person.mjs');
 
 export const f3 = a => a*a*a;
-export const f1 = a => a*a;
+const f1 = a => a*a;
+
+export {f1};
 
 export default Person;
 
