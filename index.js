@@ -5,8 +5,16 @@ const express = require('express');
 
 const app = express();
 
+
 app.get('/', (req, res)=>{
     res.send('<h2>Hello</h2>');
+});
+
+
+
+// ********** 所有路由的後面
+app.use((req, res)=>{
+    res.status(404).send(`<h2>走錯路了</h2>`);
 });
 
 const port = process.env.PORT || 3001;
