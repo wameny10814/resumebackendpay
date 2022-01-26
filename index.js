@@ -4,11 +4,19 @@ require('dotenv').config();
 const express = require('express');
 
 const app = express();
-
+/*
+app.get('/a.html', (req, res)=>{
+    res.send(`<h2>動態內容</h2><p>${Math.random()}</p>`);
+});
+*/
+app.use(express.static('public'));
 
 app.get('/', (req, res)=>{
     res.send('<h2>Hello</h2>');
 });
+
+
+
 
 
 
