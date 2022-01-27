@@ -23,6 +23,9 @@ app.get('/a/b', (req, res)=>{
 
 
 app.get('/json-sales', (req, res)=>{
+    // req.query.orderByCol=age
+    // req.query.orderByRule=desc
+
     const sales = require('./data/sales');  // 進來變成陣列
     // TODO: 排序
     console.log(sales);
@@ -30,6 +33,9 @@ app.get('/json-sales', (req, res)=>{
     
 });
 
+app.get('/try-qs', (req, res)=>{
+    res.json(req.query);
+});
 
 
 
