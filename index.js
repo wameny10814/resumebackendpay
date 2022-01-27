@@ -22,7 +22,12 @@ app.get('/a/b', (req, res)=>{
 });
 
 
-
+app.get('/json-sales', (req, res)=>{
+    const sales = require('./data/sales');  // 進來變成陣列
+    console.log(sales);
+    res.send(sales[0].name);
+    
+});
 
 
 
