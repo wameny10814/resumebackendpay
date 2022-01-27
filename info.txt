@@ -7,7 +7,9 @@ res.json()
 res.render()
 
 
+# 輸入的資料
 
+req.query  # query string
 
 
 
