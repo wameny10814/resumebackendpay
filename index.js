@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const upload = multer({dest: 'tmp_uploads/'});
+const fs = require('fs').promises;
 
 const app = express();
 
@@ -57,9 +58,18 @@ app.post('/try-post-form', (req, res)=>{
     res.render('try-post-form', req.body);
 });
 
-app.post('/try-upload', upload.single('avatar'), (req, res)=>{
+app.post('/try-upload', upload.single('avatar'), async (req, res)=>{
     //res.json(req.body);
-    res.json(req.file);
+    const types = ['image/jpeg', 'image/png'];
+    const f = req.file;
+    if(f && f.originalname){
+        if(types.includes(f.mimetype)){
+            await fs.rename(f.path, __dirname + '/public/img/' + f.originalname);
+            return res.redirect('/img/' + f.originalname);
+        }
+
+    }
+    res.send('bad');
 });
 
 // ********** 所有路由的後面
