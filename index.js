@@ -2,6 +2,8 @@ console.log(process.env.NODE_ENV);
 
 require('dotenv').config();
 const express = require('express');
+const multer = require('multer');
+const upload = multer({dest: 'tmp_uploads/'});
 
 const app = express();
 
@@ -55,6 +57,10 @@ app.post('/try-post-form', (req, res)=>{
     res.render('try-post-form', req.body);
 });
 
+app.post('/try-upload', upload.single('avatar'), (req, res)=>{
+    //res.json(req.body);
+    res.json(req.file);
+});
 
 // ********** 所有路由的後面
 app.use((req, res)=>{
