@@ -37,6 +37,10 @@ app.get('/try-qs', (req, res)=>{
     res.json(req.query);
 });
 
+const urlencodedParser = express.urlencoded({extended: false});
+app.post('/try-post', urlencodedParser, (req, res)=>{
+    res.json(req.body);
+});
 
 
 // ********** 所有路由的後面

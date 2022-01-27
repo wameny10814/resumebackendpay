@@ -9,8 +9,10 @@ res.render()
 
 # 輸入的資料
 
-req.query  # query string
+req.query  # query string (GET)
+req.body   # 表單的資料 (POST)
 
 
 
 
+middleware # 中介軟體
