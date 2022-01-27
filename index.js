@@ -14,10 +14,13 @@ app.get('/a.html', (req, res)=>{
 app.use(express.static('public'));
 
 app.get('/', (req, res)=>{
-
     res.render('home', {name:'Shinder'});
-
 });
+
+app.get('/a/b', (req, res)=>{
+    res.render('home', {name:'Shinder'});
+});
+
 
 
 
