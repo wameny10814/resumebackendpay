@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./../fontawesome/css/all.css">
+    <link rel="stylesheet" href="/fontawesome/css/all.css">
     <title>上傳多個圖檔</title>
     <style>
         .img-unit {
@@ -27,7 +27,7 @@
 <body>
 
 <form name="form1" onsubmit="return false;" style="display: none">
- <input id="sel_file" type="file" name="myfiles[]" multiple accept="image/*">
+ <input id="sel_file" type="file" name="photos" multiple accept="image/*">
 
 </form>
 
@@ -61,7 +61,7 @@
 
     function imgUnitTpl(file){
         return `<div class="img-unit" data-file="${file}">
-            <img src="uploaded/${file}" alt="">
+            <img src="/img/${file}" alt="">
             <div class="del-div">
                 <i class="fas fa-times-circle del-icon"></i>
             </div>
@@ -71,7 +71,7 @@
     function renderImgs(){
         imgsDiv.innerHTML = ''; // 清空
         for(let i of imgData){
-            imgsDiv.innerHTML += imgUnitTpl(i);
+            imgsDiv.innerHTML += imgUnitTpl(i.filename);
         }
     }
 
@@ -81,11 +81,11 @@
         if(t.classList.contains('del-icon')){
             const filename = t.closest('.img-unit').getAttribute('data-file');
             console.log(filename);
-            let loc = imgData.indexOf(filename);
-            if(loc!==-1){
-                imgData.splice(loc, 1);
-                renderImgs();
-            }
+
+            imgData = imgData.filter(el => {
+                return el.filename!==filename;
+            });
+            renderImgs();
         }
     });
 
@@ -94,23 +94,13 @@
     function doUpload(){
         const fd = new FormData(document.form1);
 
-        fetch('upload03.php', {
+        fetch('/try-uploads', {
             method: 'POST',
             body: fd
-        }).then(r=>r.json()).then(obj=>{
-            console.log(obj);
-            if(obj.success){
-
-
-                // imgData = imgData.concat(obj.files);
-                // imgData = [...imgData, ...obj.files]
-                imgData.push(...obj.files);
-
-                renderImgs();
-
-            } else {
-                alert(obj.error);
-            }
+        }).then(r=>r.json()).then(ar=>{
+            console.log(ar);
+            imgData.push(...ar);
+            renderImgs();
         });
     }
     /*
