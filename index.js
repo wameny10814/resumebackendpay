@@ -76,6 +76,11 @@ app.post('/try-upload', upload.single('avatar'), async (req, res)=>{
     */
 });
 
+app.post('/try-uploads', upload.array('photos'), async (req, res)=>{
+    
+    res.json(req.files);
+});
+
 app.get('/aa', (req, res)=>{
     // 錯誤的作法
     res.send('aaa');
