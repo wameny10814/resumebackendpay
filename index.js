@@ -66,10 +66,17 @@ app.post('/try-upload', upload.single('avatar'), async (req, res)=>{
         if(types.includes(f.mimetype)){
             await fs.rename(f.path, __dirname + '/public/img/' + f.originalname);
             return res.redirect('/img/' + f.originalname);
+        } else {
+            return res.send('檔案類型不符');
         }
-
     }
     res.send('bad');
+});
+
+app.get('/aa', (req, res)=>{
+    // 錯誤的作法
+    res.send('aaa');
+    res.send('bbb');
 });
 
 // ********** 所有路由的後面
