@@ -77,8 +77,20 @@ app.post('/try-upload', upload.single('avatar'), async (req, res)=>{
 });
 
 app.post('/try-uploads', upload.array('photos'), async (req, res)=>{
-    
-    res.json(req.files);
+    const result = req.files.map(({mimetype, filename, size}) => {
+        return {mimetype, filename, size};
+    });
+
+    /*
+    const result = req.files.map(el => {
+        return {
+            "mimetype": el.mimetype,
+            "filename": el.filename,
+            "size": el.size
+        }
+    });
+*/
+    res.json(result);
 });
 
 app.get('/aa', (req, res)=>{
