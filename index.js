@@ -24,6 +24,7 @@ app.use(express.static('public'));
 // 自訂的 頂層 middleware
 app.use((req, res, next)=>{
     res.locals.shin = '哈囉';
+    // res.send('oooo'); // 回應之後, 不會往下個路由規則
     next();
 });
 

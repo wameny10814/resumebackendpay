@@ -12,6 +12,19 @@ router.get('/', (req, res)=>{
     res.send('admin2: root');
 });
 
+router.get('/abc', (req, res)=>{
+    res.json({
+        originalUrl: req.originalUrl,
+        'locals.shin': res.locals.shin
+    });
+});
+router.get('/def', (req, res)=>{
+    res.json({
+        originalUrl: req.originalUrl,
+        'locals.shin': res.locals.shin
+    });
+});
+
 router.get('/:p1?/:p2?', (req, res)=>{
     let {
         params,
