@@ -103,6 +103,20 @@ app.get('/my-params1/:action?/:id?', (req, res)=>{
     res.json(req.params);
 });
 
+app.get(['/xxx', '/yyy'], (req, res)=>{
+    res.json({x:'y', url: req.url});
+});
+
+app.get(/^\/m\/09\d{2}-?\d{3}-?\d{3}$/i, (req, res)=>{
+    let u = req.url.split('?')[0];
+    u = u.slice(3);
+    
+    // 用空字串取代掉所有的 -
+    u = u.replace(/-/g, '');  // u = u.split('-').join('');
+
+    res.json({mobile: u});
+});
+
 
 // ********** 所有路由的後面
 app.use((req, res)=>{
