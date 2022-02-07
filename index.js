@@ -117,11 +117,11 @@ app.get(/^\/m\/09\d{2}-?\d{3}-?\d{3}$/i, (req, res)=>{
     res.json({mobile: u});
 });
 
-app.use( require('./routes/admin2') );
+app.use('/admin2',  require('./routes/admin2') );
 
 
 // ********** 所有路由的後面
-app.use((req, res)=>{
+app.use( (req, res)=>{
     res.status(404).send(`<h2>走錯路了</h2>`);
 });
 
