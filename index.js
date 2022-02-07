@@ -21,7 +21,11 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(express.static('public'));
 
-
+// 自訂的 頂層 middleware
+app.use((req, res, next)=>{
+    res.locals.shin = '哈囉';
+    next();
+});
 
 app.get('/', (req, res)=>{
     res.render('home', {name:'Shinder'});

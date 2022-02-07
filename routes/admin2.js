@@ -2,6 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
+// 自訂的 middleware
+router.use((req, res, next)=>{
+    res.locals.shin += ' admin2';
+    next();
+});
+
 router.get('/', (req, res)=>{
     res.send('admin2: root');
 });
@@ -19,6 +25,7 @@ router.get('/:p1?/:p2?', (req, res)=>{
         url,
         originalUrl,
         baseUrl,
+        'locals.shin': res.locals.shin
     });
 });
 
