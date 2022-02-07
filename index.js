@@ -99,6 +99,11 @@ app.get('/aa', (req, res)=>{
     res.send('bbb');
 });
 
+app.get('/my-params1/:action?/:id?', (req, res)=>{
+    res.json(req.params);
+});
+
+
 // ********** 所有路由的後面
 app.use((req, res)=>{
     res.status(404).send(`<h2>走錯路了</h2>`);
