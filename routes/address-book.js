@@ -3,7 +3,7 @@ const db = require('./../modules/connect-db');
 
 const router = express.Router();
 
-router.get('/list', async (req, res)=>{
+async function getListData(req, res){
     const perPage = 5; // 每一頁最多幾筆
     // 用戶要看第幾頁
     let page = req.query.page ? parseInt(req.query.page) : 1;
@@ -35,12 +35,21 @@ router.get('/list', async (req, res)=>{
 
         const sql = `SELECT * FROM \`address_book\` LIMIT ${perPage*(page-1)}, ${perPage} `;
         const [rs2] = await db.query(sql);
+        rs2.forEach(el=>{
+            el.birthday = res.locals.toDateString(el.birthday);
+        });
         output.rows = rs2;
     }
 
-    //res.json(output);
-    res.render('address-book/list', output);
+    return output;
+}
 
+
+router.get('/list', async (req, res)=>{
+    res.render('address-book/list', await getListData(req, res));
+});
+router.get('/api/list', async (req, res)=>{
+    res.json(await getListData(req, res));
 });
 
 
