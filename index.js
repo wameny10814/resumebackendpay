@@ -39,6 +39,12 @@ app.use(session({
 app.use((req, res, next)=>{
     res.locals.shin = '哈囉';
     // res.send('oooo'); // 回應之後, 不會往下個路由規則
+
+    // template helper functions 樣版輔助函式
+    res.locals.toDateString = d => moment(d).format('YYYY-MM-DD');
+    res.locals.toDatetimeString = d => moment(d).format('YYYY-MM-DD HH:mm:ss');
+
+
     next();
 });
 
