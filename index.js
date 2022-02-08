@@ -3,12 +3,14 @@ console.log(process.env.NODE_ENV);
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const MysqlStore = require('express-mysql-session')(session);
 const moment = require('moment-timezone');
 const multer = require('multer');
 // const upload = multer({dest: 'tmp_uploads/'});
 const upload = require(__dirname + '/modules/upload-imgs');
 const fs = require('fs').promises;
 const db = require('./modules/connect-db');
+const sessionStore = new MysqlStore({}, db);
 
 const app = express();
 
@@ -28,6 +30,7 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     secret: 'sdkfkdh984576894kjdkgjhdfkkjdfgjkfjsdfjhskAAAkdfjdsf',
+    store: sessionStore,
     cookie: {
         maxAge: 1200000
     }
