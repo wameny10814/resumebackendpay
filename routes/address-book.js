@@ -64,5 +64,12 @@ router.get('/api/list', async (req, res)=>{
     res.json(await getListData(req, res));
 });
 
+router.get('/add', async (req, res)=>{
+    res.render('address-book/add');
+});
+router.post('/add', async (req, res)=>{
+    
+});
+
 
 module.exports = router;
