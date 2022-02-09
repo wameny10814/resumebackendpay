@@ -24,7 +24,7 @@ async function getListData(req, res){
     const t_sql = "SELECT COUNT(1) num FROM address_book";
     const [rs1] = await db.query(t_sql);
     const totalRows = rs1[0].num;
-    let totalPages = 0;
+    // let totalPages = 0;
     if(totalRows) {
         output.totalPages = Math.ceil(totalRows/perPage);
         output.totalRows = totalRows;
