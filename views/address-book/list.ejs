@@ -1,40 +1,54 @@
-<%- include('../parts/html-head') %>
-<%- include('../parts/navbar') %>
+<%- include('../parts/html-head') %> <%- include('../parts/navbar') %>
 
 <div class="container">
-    <div class="row">
-        <div class="col">
-            <table class="table table-striped">
-                <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">姓名</th>
-                <th scope="col">手機</th>
-                <th scope="col">email</th>
-                <th scope="col">生日</th>
-                <th scope="col">地址</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% for(let i of rows){ %>
-              <tr>
-                <td><%= i.sid %></td>
-                <td><%= i.name %></td>
-                <td><%= i.mobile %></td>
-                <td><%= i.email %></td>
-                <td><%= i.birthday %></td>
-                <td><%= i.address %></td>
-              </tr>
+  <div class="row">
+    <div class="col">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              <li class="page-item <%= page===1 ? 'disabled' : '' %>">
+                  <a class="page-link" href="?page=<%= page-1 %>">Previous</a>
+                </li>
+              <% for(let i=1; i<= totalPages; i++){ %>
+              <li class="page-item <%= page===i ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
               <% } %>
-            </tbody>
-          
-            </table>
-        </div>
+              <li class="page-item <%= page===totalPages ? 'disabled' : '' %>">
+                  <a class="page-link" href="?page=<%= page+1 %>">Next</a>
+                </li>
+            </ul>
+          </nav>
     </div>
+  </div>
 
-
-
+  <div class="row">
+    <div class="col">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">姓名</th>
+            <th scope="col">手機</th>
+            <th scope="col">email</th>
+            <th scope="col">生日</th>
+            <th scope="col">地址</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let i of rows){ %>
+          <tr>
+            <td><%= i.sid %></td>
+            <td><%= i.name %></td>
+            <td><%= i.mobile %></td>
+            <td><%= i.email %></td>
+            <td><%= i.birthday %></td>
+            <td><%= i.address %></td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
-<%- include('../parts/scripts') %>
-<%- include('../parts/html-foot') %>
+<%- include('../parts/scripts') %> <%- include('../parts/html-foot') %>

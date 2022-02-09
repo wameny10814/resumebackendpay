@@ -44,7 +44,9 @@ async function getListData(req, res){
     return output;
 }
 
-
+router.get('/', async (req, res)=>{
+    res.redirect('/address-book/list');
+});
 router.get('/list', async (req, res)=>{
     res.render('address-book/list', await getListData(req, res));
 });
