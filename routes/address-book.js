@@ -10,12 +10,13 @@ async function getListData(req, res){
     if(page<1){
         return res.redirect('/address-book/list');
     }
-
+    const conditions = {};  // 傳到 ejs 的條件
     let search = req.query.search ? req.query.search : '';
     search = search.trim(); // 去掉頭尾空白
     let sqlWhere = ' WHERE 1 ';
     if(search){
-        sqlWhere = ` AND \`name\` LIKE ${db.escape('%'+search+'%')} `;
+        sqlWhere += ` AND \`name\` LIKE ${db.escape('%'+search+'%')} `;
+        conditions.search = search;
     }
 
     // 輸出
@@ -25,7 +26,8 @@ async function getListData(req, res){
         page,
         totalRows: 0,
         totalPages: 0,
-        rows: []
+        rows: [],
+        conditions
     };
 
     const t_sql = `SELECT COUNT(1) num FROM address_book ${sqlWhere} `;
