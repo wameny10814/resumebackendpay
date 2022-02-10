@@ -58,8 +58,8 @@
       age: Joi.number().required(),
     });
 
-
-    console.log( schema.validate({username:'abcjkhkjk', age:'xyz'}));
+    console.log( schema.validate({username:'abk', age:'xyz'}));
+    console.log( schema.validate({username:'abk', age:'xyz'}, {abortEarly: false}));
     console.log( schema.validate({username:'abckjkljl', age:'25'}));
 </script>
 <%- include('../parts/html-foot') %>
