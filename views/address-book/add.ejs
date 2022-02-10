@@ -47,18 +47,22 @@
         // 資料檢查
       const fd = new FormData(document.form1);
       console.log([...fd]);
-
-      for(let i of fd){
-        console.log(i);
-      }
-
-
-      /*
       const usp = new URLSearchParams(fd);
-      console.log(usp.toString());
-      console.log(usp.entries());
-      console.log({...usp});
-*/
+      // console.log([...usp]);
+      const dataObj = {};
+      for(let i of fd){
+        dataObj[i[0]] = i[1];
+      }
+      console.log({dataObj});
+      // TODO: 檢查資料格式
+
+      fetch('', {
+        method: 'POST',
+        body: fd,
+      }).then(r=>r.json())
+      .then(obj=>{
+        console.log(obj);
+      });
 
     }
 
