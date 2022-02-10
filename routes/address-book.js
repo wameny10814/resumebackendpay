@@ -47,7 +47,13 @@ async function getListData(req, res){
         const sql = `SELECT * FROM \`address_book\` ${sqlWhere} ORDER BY sid DESC LIMIT ${perPage*(page-1)}, ${perPage} `;
         const [rs2] = await db.query(sql);
         rs2.forEach(el=>{
-            el.birthday = res.locals.toDateString(el.birthday);
+            let str = res.locals.toDateString(el.birthday);
+            if(str === 'Invalid date'){
+                el.birthday = '沒有輸入資料';
+            } else {
+                el.birthday = str;
+            }
+
         });
         output.rows = rs2;
     }
@@ -101,6 +107,11 @@ router.post('/add', async (req, res)=>{
     output.result = result;
 
     res.json(output);
+});
+router.get('/delete/:sid', async (req, res)=>{
+    const sql = "DELETE FROM address_book WHERE SID=?";
+    const [result] = await db.query(sql, [req.params.sid]);
+    res.redirect('/address-book/list');
 });
 
 
