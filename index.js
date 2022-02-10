@@ -22,8 +22,8 @@ app.get('/a.html', (req, res)=>{
 */
 
 // Top-level middleware
-app.use(express.urlencoded({extended: false}));
-app.use(express.json());
+app.use(express.urlencoded({extended: false})); // application/x-www-form-urlencoded
+app.use(express.json()); // application/json
 app.use(express.static('public'));
 app.use('/joi', express.static('node_modules/joi/dist/'));
 

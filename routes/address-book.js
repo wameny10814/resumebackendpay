@@ -68,7 +68,13 @@ router.get('/api/list', async (req, res)=>{
 router.get('/add', async (req, res)=>{
     res.render('address-book/add');
 });
-router.post('/add', upload.none(), async (req, res)=>{
+// multipart/form-data
+router.post('/add2', upload.none(), async (req, res)=>{
+    res.json(req.body);
+});
+// application/x-www-form-urlencoded
+// application/json
+router.post('/add', async (req, res)=>{
     res.json(req.body);
 });
 
