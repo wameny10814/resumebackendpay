@@ -109,10 +109,23 @@ router.post('/add', async (req, res)=>{
     res.json(output);
 });
 router.get('/delete/:sid', async (req, res)=>{
-    const sql = "DELETE FROM address_book WHERE SID=?";
+    const sql = "DELETE FROM address_book WHERE sid=?";
     const [result] = await db.query(sql, [req.params.sid]);
     res.redirect('/address-book/list');
 });
 
+router.get('/edit/:sid', async (req, res)=>{
+    const sql = "SELECT * FROM address_book WHERE sid=?";
+    const [rs] = await db.query(sql, [req.params.sid]);
+
+    if(! rs.length){
+        return res.redirect('/address-book/list');
+    }
+
+    res.render('address-book/edit', rs[0]);
+});
+
+router.post('/edit/:sid', async (req, res)=>{
+});
 
 module.exports = router;
