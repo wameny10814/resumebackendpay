@@ -126,6 +126,21 @@ router.get('/edit/:sid', async (req, res)=>{
 });
 
 router.post('/edit/:sid', async (req, res)=>{
+    const output = {
+        success: false,
+        error: ''
+    };
+
+    const sql = "UPDATE `address_book` SET ? WHERE sid=?";
+
+
+    const [result] = await db.query(sql, [req.body, req.params.sid]);
+
+    console.log(result);
+    output.success = !! result.changedRows;
+    output.result = result;
+
+    res.json(output);
 });
 
 module.exports = router;
