@@ -45,8 +45,20 @@
 <script>
     function checkForm(){
         // 資料檢查
+      const fd = new FormData(document.form1);
+      console.log([...fd]);
+
+      for(let i of fd){
+        console.log(i);
+      }
 
 
+      /*
+      const usp = new URLSearchParams(fd);
+      console.log(usp.toString());
+      console.log(usp.entries());
+      console.log({...usp});
+*/
 
     }
 
