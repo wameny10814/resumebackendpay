@@ -34,6 +34,18 @@
         console.log(Person01.getInfo());
 
 
+        // 繼承
+        // https://stackoverflow.com/questions/10430279/extending-an-object-in-javascript
+
+        // Function 類型的 apply(), call(), bind()
+        // https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Function
+        const myObj = {};
+
+        function abc(a, b){
+            return this.toString() + a + b;
+        }
+
+        console.log( abc.apply(myObj, ['a', 'b']));
 
 
     </script>
