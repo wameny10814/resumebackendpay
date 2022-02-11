@@ -12,6 +12,7 @@ const fs = require('fs').promises;
 const db = require('./modules/connect-db');
 const sessionStore = new MysqlStore({}, db);
 const cors = require('cors');
+const fetch = require('node-fetch');
 
 const app = express();
 
@@ -177,6 +178,16 @@ app.get('/try-db', async (req, res)=>{
     const [rs, fields] = await db.query(sql);
 
     res.json(rs);
+
+});
+
+app.get('/yahoo', async (req, res)=>{
+
+    fetch('https://tw.yahoo.com/')
+        .then(r=>r.text())
+        .then(txt=>{
+            res.send(txt);
+        });
 
 });
 
