@@ -13,6 +13,7 @@ const db = require('./modules/connect-db');
 const sessionStore = new MysqlStore({}, db);
 const cors = require('cors');
 const fetch = require('node-fetch');
+const axios = require('axios');
 
 const app = express();
 
@@ -188,6 +189,13 @@ app.get('/yahoo', async (req, res)=>{
         .then(txt=>{
             res.send(txt);
         });
+
+});
+app.get('/yahoo2', async (req, res)=>{
+
+    const response = await axios.get('https://tw.yahoo.com/');
+    console.log(response);
+    res.send(response.data);
 
 });
 
