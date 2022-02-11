@@ -23,7 +23,14 @@ app.get('/a.html', (req, res)=>{
 */
 
 // Top-level middleware
-app.use(cors());
+const corsOptions = {
+    credentials: true,
+    origin: function(origin, cb){
+        console.log({origin});
+        cb(null, true);
+    }
+};
+app.use(cors(corsOptions));
 app.use(express.urlencoded({extended: false})); // application/x-www-form-urlencoded
 app.use(express.json()); // application/json
 app.use(express.static('public'));
