@@ -44,14 +44,18 @@ function App() {
       { (data.rows && data.rows.length) ? 
         (<nav aria-label="Page navigation example">
           <ul className="pagination">
-            <li className="page-item"><a className="page-link" href="#/">Previous</a></li>
+            <li className="page-item">
+              <a className="page-link" href="#/" onClick={()=>{getData(data.page-1)}}>Previous</a>
+            </li>
             {  Array(data.totalPages).fill(1).map((el, i)=>(
-              <li className="page-item" key={'pageLi'+i}>
+              <li className={data.page===i+1 ? 'page-item active' : 'page-item'} key={'pageLi'+i}>
                 <a className="page-link" href="#/" onClick={()=>{getData(i+1)}}>{i+1}</a>
               </li>
               ))  
             }
-            <li className="page-item"><a className="page-link" href="#/">Next</a></li>
+            <li className="page-item">
+              <a className="page-link" href="#/" onClick={()=>{getData(data.page+1)}}>Next</a>
+            </li>
           </ul>
         </nav>)
       : null
