@@ -6,14 +6,17 @@ import config from './Config';
 function App() {
   const [data, setData] = useState({});
 
+
+  const getData = async (page=1)=>{
+    const obj = await (await fetch(config.AB_LIST + `?page=${page}`)).json();
+
+    console.log(obj);
+    setData(obj);
+  };
+
+
   useEffect(()=>{
-    (async ()=>{
-      const obj = await (await fetch(config.AB_LIST)).json();
-
-      console.log(obj);
-      setData(obj);
-    })();
-
+    getData();
   }, []);
 
   console.log(data);
@@ -43,15 +46,15 @@ function App() {
           <ul className="pagination">
             <li className="page-item"><a className="page-link" href="#/">Previous</a></li>
             {  Array(data.totalPages).fill(1).map((el, i)=>(
-              <li className="page-item">
-              <a className="page-link" href="#/">{i+1}</a>
+              <li className="page-item" key={'pageLi'+i}>
+                <a className="page-link" href="#/" onClick={()=>{getData(i+1)}}>{i+1}</a>
               </li>
               ))  
             }
             <li className="page-item"><a className="page-link" href="#/">Next</a></li>
           </ul>
         </nav>)
-      : ''
+      : null
       }
       </div>
       <div className="container">
