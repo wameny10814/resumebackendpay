@@ -44,7 +44,7 @@ function App() {
       { (data.rows && data.rows.length) ? 
         (<nav aria-label="Page navigation example">
           <ul className="pagination">
-            <li className="page-item">
+            <li className={data.page===1 ? 'page-item disabled' : 'page-item'}>
               <a className="page-link" href="#/" onClick={()=>{getData(data.page-1)}}>Previous</a>
             </li>
             {  Array(data.totalPages).fill(1).map((el, i)=>(
@@ -53,7 +53,7 @@ function App() {
               </li>
               ))  
             }
-            <li className="page-item">
+            <li className={data.page===data.totalPages ? 'page-item disabled' : 'page-item'}>
               <a className="page-link" href="#/" onClick={()=>{getData(data.page+1)}}>Next</a>
             </li>
           </ul>
