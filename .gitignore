@@ -6,3 +6,4 @@ package-lock.json
 
 headers*.txt
 public/img
+tmp.txt
