@@ -7,7 +7,7 @@ const router = express.Router();
 async function getListData(req, res){
     const perPage = 5; // 每一頁最多幾筆
     // 用戶要看第幾頁
-    let page = req.query.page ? parseInt(req.query.page) : 1;
+    let page = (req.query.page && parseInt(req.query.page)) ? parseInt(req.query.page) : 1;
     if(page<1){
         return res.redirect('/address-book/list');
     }
