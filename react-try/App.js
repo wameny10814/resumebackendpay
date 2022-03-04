@@ -1,20 +1,18 @@
 import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from 'react';
+import config from './Config';
 
 
 function App() {
   const [data, setData] = useState({});
 
   useEffect(()=>{
-    fetch('http://localhost:3500/address-book/api/list')
+    fetch(config.AB_LIST)
     .then(r=>r.json())
     .then(obj=>{
       console.log(obj);
       setData(obj);
-      
-
-
     })
   }, []);
 
