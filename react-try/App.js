@@ -3,17 +3,17 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import config from './Config';
 
-
 function App() {
   const [data, setData] = useState({});
 
   useEffect(()=>{
-    fetch(config.AB_LIST)
-    .then(r=>r.json())
-    .then(obj=>{
+    (async ()=>{
+      const r1 = await fetch(config.AB_LIST);
+      const obj = await r1.json();
       console.log(obj);
       setData(obj);
-    })
+    })();
+
   }, []);
 
   console.log(data);
@@ -29,11 +29,9 @@ function App() {
           <td>{el.birthday}</td>
         </tr>)
       )
-
     } else {
       return '';
     }
-
   };
 
   return (
@@ -57,5 +55,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
