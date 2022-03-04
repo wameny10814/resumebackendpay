@@ -3,17 +3,17 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import config from './Config';
 
-
 function App() {
   const [data, setData] = useState({});
 
   useEffect(()=>{
-    fetch(config.AB_LIST)
-    .then(r=>r.json())
-    .then(obj=>{
+    (async ()=>{
+      const obj = await (await fetch(config.AB_LIST)).json();
+
       console.log(obj);
       setData(obj);
-    })
+    })();
+
   }, []);
 
   console.log(data);
@@ -21,7 +21,7 @@ function App() {
   const renderMe = (data)=>{
     if(data.rows && data.rows.length){
       return data.rows.map(el => (
-        <tr>
+        <tr key={'test' + el.sid}>
           <td>{el.sid}</td>
           <td>{el.name}</td>
           <td>{el.email}</td>
@@ -29,17 +29,15 @@ function App() {
           <td>{el.birthday}</td>
         </tr>)
       )
-
     } else {
-      return '';
+      return (<tr><td></td></tr>);
     }
-
   };
 
   return (
     <div className="App">
-      <div class="container">
-        <table class="table table-striped">
+      <div className="container">
+        <table className="table table-striped">
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -57,5 +55,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
