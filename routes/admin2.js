@@ -1,4 +1,5 @@
 const express = require('express');
+const req = require('express/lib/request');
 const res = require('express/lib/response');
 const db = require('./../modules/connect-db');
 const upload = require('./../modules/upload-imgs');
@@ -18,7 +19,18 @@ router.get('/myform/:sid', async (req, res)=>{
 
     res.json(rs);
 });
-router.put('/myform/:sid', async ()=>{
+router.put('/myform/:sid', upload.single('avatar'), async (req, res)=>{
+    // return res.json(req.body);
+    let modifyAvatar = '';
+    if(req.file && req.file.filename){
+        modifyAvatar = ` , avatar='${req.file.filename}' `;
+    };
+
+    const sql = `UPDATE admins SET nickname=? ${modifyAvatar} WHERE sid=? `;
+
+    const result = await db.query(sql, [req.body.nickname, req.params.sid ]);
+
+    res.json(result);
 
 });
 
