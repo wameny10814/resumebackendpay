@@ -15,6 +15,7 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 const axios = require('axios');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -231,9 +232,13 @@ app.post('/login', async (req, res)=>{
         return res.json(output);
     }
     
-    const {account, avatar, nickname} = row;
+    const {sid, account, avatar, nickname} = row;
     output.success = true;
     output.info = {account, avatar, nickname};
+
+    output.token = jwt.sign({sid, account}, process.env.JWT_KEY);
+
+
     res.json(output);
 
 });
