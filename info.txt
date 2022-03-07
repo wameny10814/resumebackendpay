@@ -22,3 +22,6 @@ req.session
 
 
 middleware # 中介軟體
+
+# react 插入 raw html 的方式
+https://stackoverflow.com/questions/27934238/rendering-raw-html-with-reactjs
