@@ -2,16 +2,23 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import MyForm from './MyForm';
 import reportWebVitals from './reportWebVitals';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <Route>
-        <App />
-      </Route>
+      <Switch>
+        <Route path="/" exact>
+          <App />
+        </Route>
+        <Route path="/myform" exact>
+          <MyForm />
+        </Route>
+      </Switch>
     </Router>
+    
   </React.StrictMode>,
   document.getElementById('root')
 );
