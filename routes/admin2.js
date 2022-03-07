@@ -1,4 +1,7 @@
 const express = require('express');
+const res = require('express/lib/response');
+const db = require('./../modules/connect-db');
+const upload = require('./../modules/upload-imgs');
 
 const router = express.Router();
 
@@ -6,6 +9,17 @@ const router = express.Router();
 router.use((req, res, next)=>{
     res.locals.shin += ' admin2';
     next();
+});
+
+
+router.get('/myform/:sid', async (req, res)=>{
+    const sid = parseInt(req.params.sid) || 0;
+    const [rs] = await db.query(`SELECT account,avatar,nickname FROM admins WHERE sid=${sid}`);
+
+    res.json(rs);
+});
+router.put('/myform/:sid', async ()=>{
+
 });
 
 router.get('/', (req, res)=>{
