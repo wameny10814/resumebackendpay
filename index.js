@@ -199,6 +199,15 @@ app.get('/yahoo2', async (req, res)=>{
 
 });
 
+// 登入的表單
+app.get('/login', async (req, res)=>{
+    res.render('login');
+});
+// 檢查登入帳密
+app.post('/login', async (req, res)=>{
+    res.json(req.body);
+});
+
 
 // ********** 所有路由的後面
 app.use( (req, res)=>{
