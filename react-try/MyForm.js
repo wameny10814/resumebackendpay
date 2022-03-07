@@ -5,15 +5,27 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 function MyForm() {
   const [row, setRow] = useState({});
+  const API = config.MYFORM_API + `/1`;
  
   useEffect(()=>{
       (async ()=>{
-        const obj = await (await fetch(config.MYFORM_API + `/1`)).json();
+        const obj = await (await fetch(API)).json();
         console.log(obj);
         setRow(obj[0]);
       })();
   }, []);
   console.log(row);
+
+  const whenChangedAvatar = event=>{
+    console.log(event.target.files[0]);
+
+    const reader = new FileReader();
+    reader.onload = function(event){
+        document.querySelector('#myImg').src = reader.result;
+
+    };
+    reader.readAsDataURL(event.target.files[0]); // 讀取資料
+  };
 
   return (
     <div className="App">
@@ -30,11 +42,12 @@ function MyForm() {
                     <label htmlFor="nickname" className="form-label">nickname</label>
                     <input type="text" className="form-control" id="nickname" name="nickname" defaultValue={row.nickname}/>
                 </div>
-                <div class="input-group">
-                    <input type="file" className="form-control" id="avatar" name="avatar" aria-describedby="inputGroupFileAddon04" aria-label="Upload" />
+                <div className="input-group">
+                    <input type="file" className="form-control" id="avatar" name="avatar" 
+                    onChange={whenChangedAvatar} aria-describedby="inputGroupFileAddon04" aria-label="Upload" />
                 </div>
-                <div class="input-group">
-                    <img src={config.IMG_PATH + '/' + (row.avatar || 'default.jpg')} alt=""/>
+                <div className="input-group">
+                    <img src={config.IMG_PATH + '/' + (row.avatar || 'default.jpg')} alt="" id="myImg" style={{maxWidth: '200px'}}/>
                 </div>
 
                 <button type="submit" className="btn btn-primary">Submit</button>
