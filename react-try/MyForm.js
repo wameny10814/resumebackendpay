@@ -27,11 +27,25 @@ function MyForm() {
     reader.readAsDataURL(event.target.files[0]); // 讀取資料
   };
 
+  const whenSubmit = async (event)=>{
+    event.preventDefault(); // 避免傳統方式送出表單
+
+    const fd = new FormData(document.form1);
+
+    const r = await fetch(API, {
+        method: 'PUT',
+        body: fd,
+    });
+    const obj = await r.json();
+
+    console.log(obj);
+  };
+
   return (
     <div className="App">
         <div className="container">
         <div className="row"><div className="col-lg-6">
-            <form>
+            <form name="form1" onSubmit={whenSubmit}>
                 <div className="mb-3">
                     <label htmlFor="account" className="form-label">account</label>
                     <input type="text" className="form-control" disabled
