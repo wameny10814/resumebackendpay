@@ -28,13 +28,15 @@ function MyForm() {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="nickname" className="form-label">nickname</label>
-                    <input type="text" className="form-control" id="nickname" name="nickname" value={row.nickname}/>
+                    <input type="text" className="form-control" id="nickname" name="nickname" defaultValue={row.nickname}/>
+                </div>
+                <div class="input-group">
+                    <input type="file" className="form-control" id="avatar" name="avatar" aria-describedby="inputGroupFileAddon04" aria-label="Upload" />
+                </div>
+                <div class="input-group">
+                    <img src={config.IMG_PATH + '/' + (row.avatar || 'default.jpg')} alt=""/>
                 </div>
 
-                <div className="mb-3 form-check">
-                    <input type="file" className="form-check-input" id="avatar" name="avatar"/>
-                    <img src={config.IMG_PATH + '/' + (row.avatar || 'default.png')} alt=""/>
-                </div>
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
         </div>
