@@ -70,6 +70,17 @@ router.get('/list', async (req, res)=>{
 router.get('/api/list', async (req, res)=>{
     res.json(await getListData(req, res));
 });
+router.get('/api/auth-list', async (req, res)=>{
+    if(res.locals.auth && res.locals.auth.account){
+        return res.json({...await getListData(req, res), 
+        account: res.locals.auth.account
+    }); // 正常送出資料
+    } else {
+        res.json({success: false, error: '沒有授權'});
+    }
+
+    
+});
 
 router.get('/add', async (req, res)=>{
     res.render('address-book/add');
