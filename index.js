@@ -59,6 +59,20 @@ app.use((req, res, next)=>{
     res.locals.toDatetimeString = d => moment(d).format('YYYY-MM-DD HH:mm:ss');
 
 
+    // 如果有 token 就解析(驗證)完放在 res.locals.auth
+    res.locals.auth = null; // 自訂的變數, 設定有沒有身份驗證, 預設值為 null
+    let auth = req.get('Authorization');
+    if(auth && auth.indexOf('Bearer ')===0){
+        auth = auth.slice(7);
+        try{
+            const payload = jwt.verify(auth, process.env.JWT_KEY);
+            res.locals.auth = payload;
+        } catch(ex){}
+    }
+
+
+
+
     next();
 });
 
