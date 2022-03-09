@@ -33,6 +33,19 @@ class Product {
         };
     }
 
+    async update(modi={}) {
+        const pk = this.data.sid;
+        if(!pk){
+            return {success: false}
+        }
+        const data = {...this.data, ...modi};
+        delete data.sid;
+        const [result] = await db.query(`UPDATE products SET ? WHERE sid=?`,
+                        [data, pk]);
+        console.log(result);
+        return {success: !!result.affectedRows};
+    }
+
     static async findOne(pk){
         pk = parseInt(pk);
 
