@@ -25,7 +25,7 @@ class Product {
     async save() {
         const [result] = await db.query('INSERT INTO `products` SET ?', [this.data]);
         // console.log(result);
-
+        this.data.sid = result.insertId;
         return {
             success: !! result.insertId,
             insertId: result.insertId,
@@ -44,6 +44,21 @@ class Product {
                         [data, pk]);
         console.log(result);
         return {success: !!result.affectedRows};
+    }
+
+    async remove() {
+
+        const pk = this.data.sid;
+        if(!pk){
+            return {success: false}
+        }
+
+        const [result] = await db.query(`DELETE FROM products WHERE sid=?`,
+                        [pk]);
+        delete this.data.sid;
+        console.log(result);
+        return {success: !!result.affectedRows};
+        
     }
 
     static async findOne(pk){
