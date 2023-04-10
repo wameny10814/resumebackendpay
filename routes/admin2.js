@@ -1,8 +1,8 @@
 const express = require('express');
 const req = require('express/lib/request');
 const res = require('express/lib/response');
-const db = require('./../modules/connect-db');
-const upload = require('./../modules/upload-imgs');
+// const db = require('./../modules/connect-db');
+// const upload = require('./../modules/upload-imgs');
 const axios = require('axios');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const CryptoJS =require('crypto-js'); 

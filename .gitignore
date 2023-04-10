@@ -1,11 +1,7 @@
-.vscode
-.idea
-node_modules
 
-package-lock.json
-
-headers*.txt
-public/img
-tmp.txt
+/node_modules
+/data
+/modules
 
 .env
+.gitignore
