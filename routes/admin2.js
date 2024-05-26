@@ -140,14 +140,10 @@ router.post('/checkout', async (req, res) => {
     //     packages: [ { id: 'products_1', amount: 1000, products: [Array] } ],
     //     orderID: 1678452076
     //   }
-    // res.json(order);
-    // console.log('orders',orders)
-    // console.log('checkout order', order);
-    // console.log('checkout orderid', order.orderId);
-    // res.end();
 
 })
 
+///測試用
 router.post('/createOrder/:orderid', async (req, res) => {
     const { orderid } = req.params;
     let order = orders[orderid];
@@ -283,7 +279,11 @@ router.post('/contactus', async (req, res) => {
         //純文字
         text: " ", // plaintext body
         //嵌入 html 的內文
-        html: `<p>${context}</p>`,
+        html: `
+        <p>來自${name}的訊息</p>
+        <p>聯絡方式: ${email}</p>
+        <p>信件內容如下:</p>
+        <p>${context}</p>`,
         //附件檔案
     };
 
@@ -296,6 +296,21 @@ router.post('/contactus', async (req, res) => {
         }
     });
     const result = { ...output, success: true };
+    res.json(result);
+
+})
+//login 還沒建立資料庫 以及 sql
+//希望可以加密
+router.post('/logindesu', async (req, res) => {
+    const { account, password } = req.body;
+
+    const output = {
+        success: false,
+    };
+    let result = output;
+    if(account === password){
+        result = { ...output, success: true };
+    }
     res.json(result);
 
 })
