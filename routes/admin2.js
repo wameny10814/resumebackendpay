@@ -1,6 +1,7 @@
 const express = require('express');
 const req = require('express/lib/request');
 const res = require('express/lib/response');
+const db = require(__dirname + "/../modules/mysql-connect");
 const axios = require('axios');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const CryptoJS = require('crypto-js');
