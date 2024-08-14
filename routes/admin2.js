@@ -4,11 +4,13 @@ const res = require('express/lib/response');
 const axios = require('axios');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const CryptoJS = require('crypto-js');
+const db = require(__dirname + "/../modules/mysql-connect");
 
 const Base64 = require('crypto-js/enc-base64');
 
 const router = express.Router();
 const nodemailer = require("nodemailer");
+const { date } = require('joi');
 
 
 
@@ -246,8 +248,37 @@ router.get('/confirm', async (req, res) => {
         console.log('error', error);
         res.end();
     }
+})
 
+router.post('/gotopay', async (req, res) => {
+    // const { orderid, productname, price,quantity,total,firstname,lastname,email,address,orderdate } = req.body;
+    // console.log('req.body',req.body);
+    let date = new Date();
+    const sql =
+    "INSERT INTO `cartlist`(`productname`, `price`, `quantity`, `total`, `firstname`, `lastname`,`email`,`address`,`orderid`,`orderdate`) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
+    try {
+        for (const value of req.body) {
+            await db.query(sql, [
+                value.name, 
+                value.price, 
+                value.quantity, 
+                value.total,
+                value.firstname,
+                value.lastname,
+                value.email,
+                value.address,
+                value.orderid,
+                date
+            ]);
+        }
+
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error('error:', error);
+        res.json({ success: false });
+    }
 
 })
 
@@ -314,6 +345,9 @@ router.post('/logindesu', async (req, res) => {
     res.json(result);
 
 })
+
+
+
 
 
 
