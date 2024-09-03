@@ -1,11 +1,13 @@
 const express = require('express');
 const req = require('express/lib/request');
 const res = require('express/lib/response');
-const db = require(__dirname + "/../modules/mysql-connect");
+// const db = require(__dirname + "/../modules/mysql-connect");
+const mariadb = require('mariadb');
+
 const axios = require('axios');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
 const CryptoJS = require('crypto-js');
-const db = require(__dirname + "/../modules/mysql-connect");
+
 
 const Base64 = require('crypto-js/enc-base64');
 
@@ -29,6 +31,14 @@ const {
     CONTACT_MAIL_PASS,
 } = process.env;
 
+const pool = mariadb.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    connectionLimit: 5
+});
+
 
 
 // 自訂的 middleware
@@ -39,7 +49,8 @@ const {
 let orders = {};
 router.post('/checkout', async (req, res) => {
     let frontendData = req.body;
-    console.log('frontendData', frontendData);
+    // console.log('frontendData', frontendData);
+    frontendData = frontendData.filter((data) => data.id !== 0)
     let frontendDataDeleAttr = [];
     const DeletAttr = () => {
         for (let i = 0; i < frontendData.length; i++) {
@@ -48,12 +59,17 @@ router.post('/checkout', async (req, res) => {
             delete frontendData[i].decre;
             delete frontendData[i].total;
             delete frontendData[i].key;
+            delete frontendData[i].firstname;
+            delete frontendData[i].lastname;
+            delete frontendData[i].emial;
+            delete frontendData[i].address;
+            delete frontendData[i].orderdate;
         }
         return frontendData;
 
     }
     DeletAttr();
-    console.log('afterDeleAttr', frontendData)
+    // console.log('afterDeleAttr', frontendData)
     let package = []
 
     const packageGenerate = () => {
@@ -69,7 +85,7 @@ router.post('/checkout', async (req, res) => {
         return package;
     }
     packageGenerate();
-    console.log('afterpackageGenerate', package);
+    // console.log('afterpackageGenerate', package);
 
     // after
     // { name: '豆漿波堤', price: 40, id: 1, quantity: 1 },
@@ -81,11 +97,11 @@ router.post('/checkout', async (req, res) => {
         orderId: parseInt(new Date().getTime() / 1000),
         packages: package,
     };
-    console.log('order', order);
+    // console.log('order', order);
     if (order) {
         //後端收到訂單打line api('/payments/request')
         try {
-            console.log('try', order)
+            // console.log('try', order)
             let linepayBody = {
                 ...order,
                 'redirectUrls': {
@@ -93,7 +109,7 @@ router.post('/checkout', async (req, res) => {
                     cancelUrl: `${LINEPAY_RETURN_HOST}${LINEPAY_RETURN_CANCEL_URL}`,
                 },
             };
-            console.log('linepayBody', linepayBody)
+            // console.log('linepayBody', linepayBody)
             const uri = '/payments/request';
             const nonce = parseInt(new Date().getTime() / 1000);
 
@@ -105,7 +121,7 @@ router.post('/checkout', async (req, res) => {
                 'X-LINE-Authorization-Nonce': nonce,
                 'X-LINE-Authorization': signature,
             };
-            console.log('headers', headers);
+            // console.log('headers', headers);
             const posturi = `${LINEPAY_SITE}/v3/payments/request`;
 
             const linePayRes = await axios.post(posturi, linepayBody, { headers });
@@ -252,36 +268,41 @@ router.get('/confirm', async (req, res) => {
 })
 
 router.post('/gotopay', async (req, res) => {
-    // const { orderid, productname, price,quantity,total,firstname,lastname,email,address,orderdate } = req.body;
-    // console.log('req.body',req.body);
     let date = new Date();
     const sql =
     "INSERT INTO `cartlist`(`productname`, `price`, `quantity`, `total`, `firstname`, `lastname`,`email`,`address`,`orderid`,`orderdate`) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
     try {
-        for (const value of req.body) {
-            await db.query(sql, [
-                value.name, 
-                value.price, 
-                value.quantity, 
-                value.total,
-                value.firstname,
-                value.lastname,
-                value.email,
-                value.address,
-                value.orderid,
-                date
-            ]);
+        const conn = await pool.getConnection(); 
+        try {
+            for (const value of req.body) {
+                await conn.query(sql, [
+                    value.name, 
+                    value.price, 
+                    value.quantity, 
+                    value.total,
+                    value.firstname,
+                    value.lastname,
+                    value.email,
+                    value.address,
+                    value.orderid,
+                    date
+                ]);
+            }
+
+            const result = { success: true };
+            res.json(result);
+        } catch (err) {
+            console.error('Database query error:', err);
+            res.json({ success: false, error: err.message });
+        } finally {
+            conn.release(); 
         }
-
-        res.json({ success: true });
-
     } catch (error) {
-        console.error('error:', error);
-        res.json({ success: false });
+        console.error('Connection error:', error);
+        res.json({ success: false, error: error.message });
     }
-
-})
+});
 
 router.post('/contactus', async (req, res) => {
     const { name, email, context } = req.body;
@@ -331,19 +352,140 @@ router.post('/contactus', async (req, res) => {
     res.json(result);
 
 })
-//login 還沒建立資料庫 以及 sql
-//希望可以加密
-router.post('/logindesu', async (req, res) => {
-    const { account, password } = req.body;
+
+router.post('/getproductlist', async (req, res) => {
+
+
+    const { currentpage } = req.body;
+    console.log('currentpage', currentpage);
 
     const output = {
         success: false,
     };
-    let result = output;
-    if(account === password){
-        result = { ...output, success: true };
-    }
-    res.json(result);
+
+    const sql = `SELECT * FROM prosuctlist WHERE sid BETWEEN ? AND ?`;
+    const params = [currentpage * 10 - 9, currentpage * 10];
+
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+            // rows.forEach((row) => {
+            // console.log(`name: ${row.name}, sid: ${row.sid}`)
+            // })
+
+            const result = { ...output, success: true,data:rows };
+            res.json(result);
+            conn.release()
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+
+
+})
+
+
+//login 還沒建立資料庫 以及 sql
+//希望可以加密
+router.post('/logindesu', async (req, res) => {
+    const { username, password } = req.body;
+
+    console.log('username',username);
+    console.log('password',password);
+
+    let result = {
+        success: false,
+    };
+
+    const sql = `SELECT * FROM peafuldonut.member WHERE account = ? AND password = ?`
+    const params = [username, password];
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+
+            if(rows.length ==1){
+                
+                result = { ...result, success: true,data:rows };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+    
+
+ 
+
+})
+
+router.get('/findproducttyps', async (req, res) => {
+    let result = {
+        success: false,
+    };
+
+    const sql = `SELECT name FROM prosuctlist `
+
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql)
+        .then((rows) => {
+
+            if(rows.length >=1){
+        
+                result = { ...result, success: true,data:rows };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+    
+
+ 
 
 })
 
