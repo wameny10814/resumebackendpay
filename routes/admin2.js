@@ -54,7 +54,6 @@ router.post('/checkout', async (req, res) => {
     let frontendDataDeleAttr = [];
     const DeletAttr = () => {
         for (let i = 0; i < frontendData.length; i++) {
-            console.log('for')
             delete frontendData[i].incre;
             delete frontendData[i].decre;
             delete frontendData[i].total;
@@ -114,7 +113,7 @@ router.post('/checkout', async (req, res) => {
             const nonce = parseInt(new Date().getTime() / 1000);
 
             const signature = Base64.stringify(hmacSHA256(`${LINEPAY_CHANNEL_SECRET_KEY}/${LINEPAY_VERSION}${uri}${JSON.stringify(linepayBody)}${nonce}`, LINEPAY_CHANNEL_SECRET_KEY,));
-            console.log('signature', signature);
+            // console.log('signature', signature);
             const headers = {
                 'X-LINE-ChannelId': LINEPAY_CHANNEL_ID,
                 'Content-Type': 'application/json',
@@ -137,7 +136,6 @@ router.post('/checkout', async (req, res) => {
         }
 
     } else {
-        console.log('無訂單')
         res.json({
             'message': '訂單金額為零'
         })
@@ -196,7 +194,7 @@ router.post('/createOrder/:orderid', async (req, res) => {
                 cancelUrl: `${LINEPAY_RETURN_HOST}${LINEPAY_RETURN_CANCEL_URL}`,
             },
         };
-        console.log('linepayBody', linepayBody)
+        // console.log('linepayBody', linepayBody)
         const uri = '/payments/request';
         const nonce = parseInt(new Date().getTime() / 1000);
 
@@ -207,7 +205,7 @@ router.post('/createOrder/:orderid', async (req, res) => {
             'X-LINE-Authorization-Nonce': nonce,
             'X-LINE-Authorization': signature,
         };
-        console.log('headers', headers);
+        // console.log('headers', headers);
         const posturi = `${LINEPAY_SITE}/v3/payments/request`;
         const linePayRes = await axios.post(posturi, linepayBody, { headers });
         console.log('linePayRes', linePayRes.data.info);
@@ -236,7 +234,7 @@ router.get('/confirm', async (req, res) => {
             "amount": order.amount,
             'currency': 'TWD',
         };
-        console.log('linepayBody', linepayBody)
+        // console.log('linepayBody', linepayBody)
         // 文件 POST /v3/payments/{transactionId}/confirm
         const uri = `/payments/${transactionId}/confirm`;
         const nonce = parseInt(new Date().getTime() / 1000);
@@ -248,7 +246,7 @@ router.get('/confirm', async (req, res) => {
             'X-LINE-Authorization-Nonce': nonce,
             'X-LINE-Authorization': signature,
         };
-        console.log('headers', headers);
+        // console.log('headers', headers);
         const posturi = `${LINEPAY_SITE}/v3/payments/${transactionId}/confirm`;
         const linePayRes = await axios.post(posturi, linepayBody, { headers });
         console.log('linePayRes', linePayRes);
@@ -357,13 +355,11 @@ router.post('/getproductlist', async (req, res) => {
 
 
     const { currentpage } = req.body;
-    console.log('currentpage', currentpage);
-
     const output = {
         success: false,
     };
 
-    const sql = `SELECT * FROM prosuctlist WHERE sid BETWEEN ? AND ?`;
+    const sql = `SELECT * FROM prosuctlist WHERE sid BETWEEN ? AND ? AND status = 1`;
     const params = [currentpage * 10 - 9, currentpage * 10];
 
 
@@ -400,14 +396,11 @@ router.post('/getproductlist', async (req, res) => {
 router.post('/logindesu', async (req, res) => {
     const { username, password } = req.body;
 
-    console.log('username',username);
-    console.log('password',password);
-
     let result = {
         success: false,
     };
 
-    const sql = `SELECT * FROM peafuldonut.member WHERE account = ? AND password = ?`
+    const sql = `SELECT * FROM peafuldonut.membership WHERE account = ? AND password = ?`
     const params = [username, password];
 
     pool
@@ -488,6 +481,280 @@ router.get('/findproducttyps', async (req, res) => {
  
 
 })
+
+router.get('/getproducts', async (req, res) => {
+    let result = {
+        success: false,
+    };
+
+    const sql = `SELECT * FROM prosuctlist WHERE status = 1`;
+
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql)
+        .then((rows) => {
+
+            if(rows.length >=1){
+        
+                result = { ...result, success: true,data:rows };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+})
+
+
+router.post('/filter', async (req, res) => {
+    let date = new Date();
+    const { startdate, enddate,selectedproduct } = req.body;
+    
+    //區間全品項數量 假如資料庫有記時間的話可以這樣寫sql
+    // const sql =
+    // "SELECT * FROM cartlist WHERE orderdate >= '2024-09-02' AND orderdate < '2024-09-03'";
+
+    const sql =
+    "SELECT * FROM cartlist WHERE orderdate BETWEEN ? AND ?";
+    const sqlforselectedproduct = 
+    "SELECT quantity, TO_CHAR(orderdate, 'YYYY-MM-DD')AS order_month FROM cartlist WHERE productname = ? AND orderdate BETWEEN ? AND ? GROUP BY order_month"
+
+
+
+    const paramsForBar = [startdate,enddate];
+    const paramsForLiner = [selectedproduct,startdate,enddate];
+
+    let result = {
+        success: false,
+    };
+
+    let datesForLiner = [];
+    let quantitiesForLiner =[];
+
+    
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,paramsForBar)
+        .then((rows) => {
+        
+            conn.query(sqlforselectedproduct,paramsForLiner)
+            .then((rowsforliner)=>{
+                rowsforliner.forEach(item=>{
+                    datesForLiner.push(item.order_month);
+                    quantitiesForLiner.push(item.quantity);
+                })
+
+
+                result = { ...result,linerData:{labels:datesForLiner, data:quantitiesForLiner} };
+
+                if(rows){
+
+                    const totalQuantities = {};
+    
+                    rows.forEach(item => {
+                    if (totalQuantities[item.productname]) {
+                        totalQuantities[item.productname] += item.quantity;
+                    } else {
+                        totalQuantities[item.productname] = item.quantity;
+                    }
+                    });
+    
+                    // console.log(totalQuantities);
+    
+                    const productnames = [];
+                    const quantities = [];
+    
+                    Object.entries(totalQuantities).forEach(([key, value]) => {
+                        productnames.push(key);      
+                        quantities.push(value);  
+                    });
+    
+                    result = { ...result, success: true,barData:{
+                        labels:productnames,data:quantities
+                    }};
+                    res.json(result);
+                    conn.release()
+    
+                }else{
+    
+                    res.json(result);
+                    conn.release()
+    
+                }
+                
+            });
+
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+ 
+
+});
+
+router.post('/addproducs', async (req, res) => {
+
+    const { name, price,description,type,status,pic } = req.body;
+    let result = {
+        success: false,
+    };
+
+    const sql =  "INSERT INTO `prosuctlist`(`name`, `price`, `description`, `type`, `status`,`pic`) VALUES (?,?,?,?,?,?)";
+    const params = [name,price,description,type,status,pic];
+
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+
+            if(rows){
+        
+                result = { ...result, success: true };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+})
+
+router.put('/editproducs', async (req, res) => {
+
+    const { name, price,description,type,status,pic,sid } = req.body;
+    let result = {
+        success: false,
+    };
+
+    const sql =  "UPDATE `prosuctlist ` SET `name` =?, `price` =?, `description` = ?, `type` =?, `status`=?,`pic`=?  WHERE sid = ?";
+    const params = [name,price,description,type,status,pic,sid];
+
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+
+            console.log('rows',rows);
+
+            if(rows){
+        
+                result = { ...result, success: true };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+})
+
+router.delete('/deleteproducs', async (req, res) => {
+
+    const { sid } = req.body;
+    let result = {
+        success: false,
+    };
+
+    const sql =  "DELETE FROM `peafuldonut`.`prosuctlist` WHERE  `sid`=?";
+    const params = [sid];
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+
+            console.log('rows',rows);
+
+            if(rows){
+        
+                result = { ...result, success: true };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+})
+
+
+
+
+
+
 
 
 
