@@ -487,7 +487,7 @@ router.get('/getproducts', async (req, res) => {
         success: false,
     };
 
-    const sql = `SELECT * FROM prosuctlist WHERE status = 1`;
+    const sql = `SELECT * FROM prosuctlist`;
 
 
     pool
@@ -526,15 +526,23 @@ router.get('/getproducts', async (req, res) => {
 router.post('/filter', async (req, res) => {
     let date = new Date();
     const { startdate, enddate,selectedproduct } = req.body;
+
+    console.log('startdate',startdate);
+    console.log('enddate',enddate);
+    console.log('selectedproduct',selectedproduct);
     
     //區間全品項數量 假如資料庫有記時間的話可以這樣寫sql
     // const sql =
     // "SELECT * FROM cartlist WHERE orderdate >= '2024-09-02' AND orderdate < '2024-09-03'";
 
-    const sql =
-    "SELECT * FROM cartlist WHERE orderdate BETWEEN ? AND ?";
+    const sqlforall =
+    "SELECT * ,TO_CHAR(birthday, 'YYYY')AS birthyear FROM cartlist WHERE orderdate BETWEEN ? AND ?";
     const sqlforselectedproduct = 
     "SELECT quantity, TO_CHAR(orderdate, 'YYYY-MM-DD')AS order_month FROM cartlist WHERE productname = ? AND orderdate BETWEEN ? AND ? GROUP BY order_month"
+    const sqlforgender = "SELECT SUM(gender = 'F' ) AS F ,SUM(gender = 'M' ) AS M FROM cartlist";
+    
+    
+    
 
 
 
@@ -553,8 +561,73 @@ router.post('/filter', async (req, res) => {
     .getConnection()
     .then((conn) => {
         conn
-        .query(sql,paramsForBar)
+        .query(sqlforall,paramsForBar)
         .then((rows) => {
+            console.log('rows1 這是全資料',rows);
+            //年齡比資料
+            let newdate = new Date();
+            let thisyear = newdate.getFullYear();
+
+            let ages =  rows.map(item=>{
+                return thisyear-item.birthyear*1
+            })
+            let agebirdge = {};
+            ages.forEach((currentage)=>{
+                if(agebirdge[currentage]){
+                    agebirdge[currentage] +=1
+                }else{
+                    agebirdge[currentage] = 1
+                }
+                
+            })
+
+            let ageslabes = [];
+            let agesdata = [];
+
+            Object.entries(agebirdge).forEach(([key, value]) => {
+                ageslabes.push(key);      
+                agesdata.push(value);  
+            });
+
+        
+
+            //區域比資料
+
+            let sections =  rows.map(item=>{
+                return item.section
+            })
+
+            let sectionsbirdge = {};
+            sections.forEach((current)=>{
+                if(sectionsbirdge[current]){
+                    sectionsbirdge[current] +=1
+                }else{
+                    sectionsbirdge[current] = 1
+                }
+                
+            })
+
+            let sectionslabes = [];
+            let sectionsdata = [];
+
+            Object.entries(sectionsbirdge).forEach(([key, value]) => {
+                sectionslabes.push(key);      
+                sectionsdata.push(value);  
+            });
+
+            result = { ...result,
+                    agesData:{labels:ageslabes, data:agesdata},
+                    sectionsData:{labels:sectionslabes, data:sectionsdata}
+                 };
+
+            
+
+
+            
+
+
+            
+            
         
             conn.query(sqlforselectedproduct,paramsForLiner)
             .then((rowsforliner)=>{
@@ -591,8 +664,8 @@ router.post('/filter', async (req, res) => {
                     result = { ...result, success: true,barData:{
                         labels:productnames,data:quantities
                     }};
-                    res.json(result);
                     conn.release()
+                   
     
                 }else{
     
@@ -602,6 +675,25 @@ router.post('/filter', async (req, res) => {
                 }
                 
             });
+
+            conn.query(sqlforgender)
+            .then((datas)=>{
+
+                result = { ...result, success: true,genderData:{
+                    labels:['女性','男性'],data:[datas[0].F,datas[0].M]
+                }};
+
+                res.json(result);
+                console.log('result!!',result);
+
+
+            })
+
+           
+
+
+
+
 
 
         })
@@ -661,14 +753,14 @@ router.post('/addproducs', async (req, res) => {
 
 })
 
-router.put('/editproducs', async (req, res) => {
+router.post('/editproducs', async (req, res) => {
 
     const { name, price,description,type,status,pic,sid } = req.body;
     let result = {
         success: false,
     };
 
-    const sql =  "UPDATE `prosuctlist ` SET `name` =?, `price` =?, `description` = ?, `type` =?, `status`=?,`pic`=?  WHERE sid = ?";
+    const sql =  "UPDATE `prosuctlist` SET `name` =?, `price` =?, `description` = ?, `type` =?, `status`=?,`pic`=?  WHERE sid = ?";
     const params = [name,price,description,type,status,pic,sid];
 
 
