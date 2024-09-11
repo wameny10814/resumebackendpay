@@ -268,7 +268,7 @@ router.get('/confirm', async (req, res) => {
 router.post('/gotopay', async (req, res) => {
     let date = new Date();
     const sql =
-    "INSERT INTO `cartlist`(`productname`, `price`, `quantity`, `total`, `firstname`, `lastname`,`email`,`address`,`orderid`,`orderdate`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+    "INSERT INTO `cartlist`(`productname`, `price`, `quantity`, `total`, `firstname`, `lastname`,`email`,`address`,`orderid`,`orderdate`,`section`,`gender`,`birthday`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     try {
         const conn = await pool.getConnection(); 
@@ -284,7 +284,10 @@ router.post('/gotopay', async (req, res) => {
                     value.email,
                     value.address,
                     value.orderid,
-                    date
+                    date,
+                    value.section,
+                    value.gender,
+                    value.birthday
                 ]);
             }
 
@@ -527,9 +530,9 @@ router.post('/filter', async (req, res) => {
     let date = new Date();
     const { startdate, enddate,selectedproduct } = req.body;
 
-    console.log('startdate',startdate);
-    console.log('enddate',enddate);
-    console.log('selectedproduct',selectedproduct);
+    // console.log('startdate',startdate);
+    // console.log('enddate',enddate);
+    // console.log('selectedproduct',selectedproduct);
     
     //區間全品項數量 假如資料庫有記時間的話可以這樣寫sql
     // const sql =
@@ -539,7 +542,7 @@ router.post('/filter', async (req, res) => {
     "SELECT * ,TO_CHAR(birthday, 'YYYY')AS birthyear FROM cartlist WHERE orderdate BETWEEN ? AND ?";
     const sqlforselectedproduct = 
     "SELECT quantity, TO_CHAR(orderdate, 'YYYY-MM-DD')AS order_month FROM cartlist WHERE productname = ? AND orderdate BETWEEN ? AND ? GROUP BY order_month"
-    const sqlforgender = "SELECT SUM(gender = 'F' ) AS F ,SUM(gender = 'M' ) AS M FROM cartlist";
+    const sqlforgender = "SELECT SUM(gender = 'F' ) AS F ,SUM(gender = 'M' ) AS M,SUM(gender = 'O' ) AS O FROM cartlist";
     
     
     
@@ -665,7 +668,6 @@ router.post('/filter', async (req, res) => {
                         labels:productnames,data:quantities
                     }};
                     conn.release()
-                   
     
                 }else{
     
@@ -678,18 +680,16 @@ router.post('/filter', async (req, res) => {
 
             conn.query(sqlforgender)
             .then((datas)=>{
-
+                
                 result = { ...result, success: true,genderData:{
-                    labels:['女性','男性'],data:[datas[0].F,datas[0].M]
-                }};
+                    labels:['女性','男性','其他'],data:[datas[0].F,datas[0].M,datas[0].O],
+                },selecteditem:selectedproduct};
 
                 res.json(result);
-                console.log('result!!',result);
-
-
+                // console.log('result!!',result);
             })
 
-           
+    
 
 
 
