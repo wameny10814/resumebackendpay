@@ -3,6 +3,8 @@ const req = require('express/lib/request');
 const res = require('express/lib/response');
 // const db = require(__dirname + "/../modules/mysql-connect");
 const mariadb = require('mariadb');
+const multer = require('multer');
+const path = require('path');
 
 const axios = require('axios');
 const hmacSHA256 = require('crypto-js/hmac-sha256');
@@ -14,6 +16,7 @@ const Base64 = require('crypto-js/enc-base64');
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const { date } = require('joi');
+const { log } = require('console');
 
 
 
@@ -38,6 +41,19 @@ const pool = mariadb.createPool({
     database: process.env.DB_NAME,
     connectionLimit: 5
 });
+
+// 配置 Multer 的存儲選項
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      // 設定文件存儲的目錄
+    cb(null, 'public/uploads/');
+},
+filename: function (req, file, cb) {
+    // 設定文件名，例如：1234567890.jpg
+    cb(null, Date.now() + path.extname(file.originalname));
+}
+});
+
 
 
 
@@ -525,6 +541,47 @@ router.get('/getproducts', async (req, res) => {
 
 })
 
+router.get('/getproductdetail/:id', async (req, res) => {
+    let result = {
+        success: false,
+    };
+    let id = req.params.id
+    const sql = `SELECT * FROM prosuctlist WHERE sid = ?`;
+    const params = [id];
+
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+
+            if(rows.length >=1){
+        
+                result = { ...result, success: true,data:rows };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+})
+
 
 router.post('/filter', async (req, res) => {
     let date = new Date();
@@ -566,7 +623,7 @@ router.post('/filter', async (req, res) => {
         conn
         .query(sqlforall,paramsForBar)
         .then((rows) => {
-            console.log('rows1 這是全資料',rows);
+            // console.log('rows1 這是全資料',rows);
             //年齡比資料
             let newdate = new Date();
             let thisyear = newdate.getFullYear();
@@ -796,6 +853,7 @@ router.post('/editproducs', async (req, res) => {
         throw err
     })
 
+
 })
 
 router.delete('/deleteproducs', async (req, res) => {
@@ -841,6 +899,56 @@ router.delete('/deleteproducs', async (req, res) => {
     })
 
 })
+
+
+// 創建 Multer 上傳中間件
+const upload = multer({ storage: storage });
+//修改商品
+router.post('/upload', upload.single('image'), (req, res) => {
+    // `req.file` 包含上傳的文件
+    const { pic,sid } = req.body;
+    const { filename} = req.file;
+    console.log('req',filename);
+
+    let result = {
+        success: false,
+    };
+
+    const sql =  "UPDATE `prosuctlist` SET `pic`=?  WHERE sid = ?";
+    const params = [filename,sid];
+
+    pool
+    .getConnection()
+    .then((conn) => {
+        conn
+        .query(sql,params)
+        .then((rows) => {
+            if(rows){
+        
+                result = { ...result, success: true };
+                res.json(result);
+                conn.release()
+
+            }else{
+
+                res.json(result);
+                conn.release()
+
+            }
+
+        })
+        .catch((err) => {
+            conn.release()
+            throw err
+        })
+    })
+    .catch((err) => {
+        throw err
+    })
+
+    
+});
+
 
 
 
