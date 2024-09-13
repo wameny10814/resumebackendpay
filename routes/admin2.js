@@ -12,6 +12,7 @@ const CryptoJS = require('crypto-js');
 
 
 const Base64 = require('crypto-js/enc-base64');
+const bodyParser = require('body-parser');
 
 const router = express.Router();
 const nodemailer = require("nodemailer");
@@ -53,6 +54,12 @@ filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
 }
 });
+
+// 創建 Multer 上傳中間件
+const upload = multer({ storage: storage });
+
+router.use(bodyParser.json({ limit: '10mb' })); // 設置 JSON 數據解析大小限制
+router.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // 設置 URL 編碼數據的解析大小限制
 
 
 
@@ -774,8 +781,13 @@ router.post('/addproducs', async (req, res) => {
         success: false,
     };
 
-    const sql =  "INSERT INTO `prosuctlist`(`name`, `price`, `description`, `type`, `status`,`pic`) VALUES (?,?,?,?,?,?)";
-    const params = [name,price,description,type,status,pic];
+    let date =  new Date();
+
+    const sql =  "INSERT INTO `prosuctlist`(`name`, `price`, `description`, `type`, `status`,`updatedate`) VALUES (?,?,?,?,?,?)";
+    const params = [name,price,description,type,status,date];
+    //找出剛新增完最新的那筆資料
+    const getLatestIdSql = "SELECT sid FROM `prosuctlist` ORDER BY `updatedate` DESC LIMIT 1"; 
+
 
 
     pool
@@ -784,12 +796,27 @@ router.post('/addproducs', async (req, res) => {
         conn
         .query(sql,params)
         .then((rows) => {
+            // console.log('rows',rows);
 
             if(rows){
-        
-                result = { ...result, success: true };
-                res.json(result);
-                conn.release()
+                if (rows.affectedRows > 0) {
+                    // 插入成功後，查詢最新的 `sid`
+                    // console.log('rows2',rows.affectedRows);
+                    conn.query(getLatestIdSql)
+                        .then((idRows) => {
+                            const sid = idRows[0].sid; // 獲取最新的 sid
+                            result = { ...result, success: true, sid: sid,type:'added' }; // 返回 sid
+                            res.json(result);
+                            conn.release();
+                        })
+                        .catch((err) => {
+                            conn.release();
+                            throw err;
+                        });
+                } else {
+                    res.json(result);
+                    conn.release();
+                }
 
             }else{
 
@@ -812,13 +839,14 @@ router.post('/addproducs', async (req, res) => {
 
 router.post('/editproducs', async (req, res) => {
 
-    const { name, price,description,type,status,pic,sid } = req.body;
+    const { name, price,description,type,status,sid } = req.body;
+    let date =  new Date();
     let result = {
         success: false,
     };
 
-    const sql =  "UPDATE `prosuctlist` SET `name` =?, `price` =?, `description` = ?, `type` =?, `status`=?,`pic`=?  WHERE sid = ?";
-    const params = [name,price,description,type,status,pic,sid];
+    const sql =  "UPDATE `prosuctlist` SET `name` =?, `price` =?, `description` = ?, `type` =?, `status`=?, `updatedate`=? WHERE sid = ?";
+    const params = [name,price,description,type,status,date,sid];
 
 
     pool
@@ -828,11 +856,11 @@ router.post('/editproducs', async (req, res) => {
         .query(sql,params)
         .then((rows) => {
 
-            console.log('rows',rows);
+            // console.log('rows',rows);
 
             if(rows){
         
-                result = { ...result, success: true };
+                result = { ...result, success: true,type:'edited' };
                 res.json(result);
                 conn.release()
 
@@ -873,7 +901,7 @@ router.delete('/deleteproducs', async (req, res) => {
         .query(sql,params)
         .then((rows) => {
 
-            console.log('rows',rows);
+            // console.log('rows',rows);
 
             if(rows){
         
@@ -901,14 +929,14 @@ router.delete('/deleteproducs', async (req, res) => {
 })
 
 
-// 創建 Multer 上傳中間件
-const upload = multer({ storage: storage });
+
 //修改商品
 router.post('/upload', upload.single('image'), (req, res) => {
     // `req.file` 包含上傳的文件
     const { pic,sid } = req.body;
     const { filename} = req.file;
-    console.log('req',filename);
+    // console.log('req',filename);
+    // console.log('sid',sid);
 
     let result = {
         success: false,
