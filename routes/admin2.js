@@ -903,7 +903,7 @@ router.delete('/deleteproducs', async (req, res) => {
         success: false,
     };
 
-    const sql =  "DELETE FROM `peafuldonut`.`prosuctlist` WHERE  `sid`=?";
+    const sql =  "DELETE FROM `prosuctlist` WHERE  `sid`=?";
     const params = [sid];
 
     pool
