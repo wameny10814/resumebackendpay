@@ -438,7 +438,7 @@ router.post('/logindesu', async (req, res) => {
         success: false,
     };
 
-    const sql = `SELECT * FROM peafuldonut.membership WHERE account = ? AND password = ?`
+    const sql = `SELECT * FROM membership WHERE account = ? AND password = ?`
     const params = [username, password];
 
     pool
