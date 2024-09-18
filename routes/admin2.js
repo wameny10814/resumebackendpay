@@ -69,6 +69,14 @@ router.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // 設置 
 //     res.locals.shin += ' admin2';
 //     next();
 // });
+
+router.get('/test', async (req, res) => {
+    
+        res.json({
+            'message': '訂單金額為零'
+        })
+    
+})
 let orders = {};
 router.post('/checkout', async (req, res) => {
     let frontendData = req.body;
