@@ -23,14 +23,14 @@ app.set('view engine', 'ejs');
 
 
 // Top-level middleware
-const corsOptions = {
-    credentials: true,
-    origin: function(origin, cb){
-        console.log({origin});
-        cb(null, true);
-    }
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//     credentials: true,
+//     origin: function(origin, cb){
+//         console.log({origin});
+//         cb(null, true);
+//     }
+// };
+app.use(cors());
 app.use(express.urlencoded({extended: false})); // application/x-www-form-urlencoded
 app.use(express.json()); // application/json
 app.use(express.static('public'));

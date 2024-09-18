@@ -19,6 +19,10 @@ const nodemailer = require("nodemailer");
 const { date } = require('joi');
 const { log } = require('console');
 
+const cors = require('cors');
+
+
+
 
 
 // 環境變數
