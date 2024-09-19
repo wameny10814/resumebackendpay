@@ -646,10 +646,9 @@ router.post('/filter', async (req, res) => {
             //年齡比資料
             let newdate = new Date();
             let thisyear = newdate.getFullYear();
-            let birthdayyear = item.birthyear*1;
 
             let ages =  rows.map(item=>{
-                return thisyear - birthdayyear
+                return thisyear - Number(item.birthyear)
             })
             let agebirdge = {};
             ages.forEach((currentage)=>{
