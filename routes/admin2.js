@@ -606,9 +606,9 @@ router.post('/filter', async (req, res) => {
     let date = new Date();
     const { startdate, enddate,selectedproduct } = req.body;
 
-    // console.log('startdate',startdate);
-    // console.log('enddate',enddate);
-    // console.log('selectedproduct',selectedproduct);
+    console.log('startdate',startdate);
+    console.log('enddate',enddate);
+    console.log('selectedproduct',selectedproduct);
     
     //區間全品項數量 假如資料庫有記時間的話可以這樣寫sql
     // const sql =
@@ -762,7 +762,7 @@ router.post('/filter', async (req, res) => {
                 },selecteditem:selectedproduct};
 
                 res.json(result);
-                // console.log('result!!',result);
+                console.log('result!!',result);
             })
 
     
