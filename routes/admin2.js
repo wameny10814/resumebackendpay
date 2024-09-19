@@ -146,7 +146,8 @@ router.post('/checkout', async (req, res) => {
             };
             // console.log('linepayBody', linepayBody)
             const uri = '/payments/request';
-            const nonce = parseInt(new Date().getTime() / 1000);
+            // const nonce = parseInt(new Date().getTime() / 1000);
+            const nonce = Math.floor(new Date().getTime() / 1000);
 
             const signature = Base64.stringify(hmacSHA256(`${LINEPAY_CHANNEL_SECRET_KEY}/${LINEPAY_VERSION}${uri}${JSON.stringify(linepayBody)}${nonce}`, LINEPAY_CHANNEL_SECRET_KEY,));
             // console.log('signature', signature);
@@ -156,7 +157,7 @@ router.post('/checkout', async (req, res) => {
                 'X-LINE-Authorization-Nonce': nonce,
                 'X-LINE-Authorization': signature,
             };
-            // console.log('headers', headers);
+            console.log('headers', headers);
             const posturi = `${LINEPAY_SITE}/v3/payments/request`;
 
             const linePayRes = await axios.post(posturi, linepayBody, { headers });
