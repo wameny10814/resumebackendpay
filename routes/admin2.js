@@ -44,7 +44,8 @@ const pool = mariadb.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    connectionLimit: 5
+    connectionLimit: 5,
+    charset: 'utf8mb4'
 });
 
 // 配置 Multer 的存儲選項
@@ -162,6 +163,7 @@ router.post('/checkout', async (req, res) => {
             console.log('linePayRes', linePayRes);
             console.log('linePayRes', linePayRes.data.info);
             if (linePayRes?.data?.returnCode === '0000') {
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(linePayRes.data.info);
             }
 
@@ -245,6 +247,7 @@ router.post('/createOrder/:orderid', async (req, res) => {
         const linePayRes = await axios.post(posturi, linepayBody, { headers });
         console.log('linePayRes', linePayRes.data.info);
         if (linePayRes?.data?.returnCode === '0000') {
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.json(linePayRes.data.info);
             // res.redirect(linePayRes?.data?.info?.web)
         } else {
@@ -327,15 +330,18 @@ router.post('/gotopay', async (req, res) => {
             }
 
             const result = { success: true };
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.json(result);
         } catch (err) {
             console.error('Database query error:', err);
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.json({ success: false, error: err.message });
         } finally {
             conn.release(); 
         }
     } catch (error) {
         console.error('Connection error:', error);
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
         res.json({ success: false, error: error.message });
     }
 });
@@ -412,6 +418,7 @@ router.post('/getproductlist', async (req, res) => {
             // })
 
             const result = { ...output, success: true,data:rows };
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.json(result);
             conn.release()
         })
@@ -451,11 +458,12 @@ router.post('/logindesu', async (req, res) => {
             if(rows.length ==1){
                 
                 result = { ...result, success: true,data:rows };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -494,11 +502,12 @@ router.get('/findproducttyps', async (req, res) => {
             if(rows.length >=1){
         
                 result = { ...result, success: true,data:rows };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -538,11 +547,12 @@ router.get('/getproducts', async (req, res) => {
             if(rows.length >=1){
         
                 result = { ...result, success: true,data:rows };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -579,11 +589,12 @@ router.get('/getproductdetail/:id', async (req, res) => {
             if(rows.length >=1){
         
                 result = { ...result, success: true,data:rows };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -746,7 +757,7 @@ router.post('/filter', async (req, res) => {
                     conn.release()
     
                 }else{
-    
+                    res.setHeader('Content-Type', 'application/json; charset=utf-8');
                     res.json(result);
                     conn.release()
     
@@ -760,7 +771,7 @@ router.post('/filter', async (req, res) => {
                 result = { ...result, success: true,genderData:{
                     labels:['女性','男性','其他'],data:[datas[0].F,datas[0].M,datas[0].O],
                 },selecteditem:selectedproduct};
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 console.log('result!!',result);
             })
@@ -818,6 +829,7 @@ router.post('/addproducs', async (req, res) => {
                         .then((idRows) => {
                             const sid = idRows[0].sid; // 獲取最新的 sid
                             result = { ...result, success: true, sid: sid,type:'added' }; // 返回 sid
+                            res.setHeader('Content-Type', 'application/json; charset=utf-8');
                             res.json(result);
                             conn.release();
                         })
@@ -826,12 +838,13 @@ router.post('/addproducs', async (req, res) => {
                             throw err;
                         });
                 } else {
+                    res.setHeader('Content-Type', 'application/json; charset=utf-8');
                     res.json(result);
                     conn.release();
                 }
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -873,11 +886,12 @@ router.post('/editproducs', async (req, res) => {
             if(rows){
         
                 result = { ...result, success: true,type:'edited' };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -918,11 +932,12 @@ router.delete('/deleteproducs', async (req, res) => {
             if(rows){
         
                 result = { ...result, success: true };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
@@ -966,11 +981,12 @@ router.post('/upload', upload.single('image'), (req, res) => {
             if(rows){
         
                 result = { ...result, success: true };
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
             }else{
-
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
                 res.json(result);
                 conn.release()
 
