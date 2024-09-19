@@ -615,9 +615,9 @@ router.post('/filter', async (req, res) => {
     // "SELECT * FROM cartlist WHERE orderdate >= '2024-09-02' AND orderdate < '2024-09-03'";
 
     const sqlforall =
-    "SELECT * ,TO_CHAR(birthday, 'YYYY')AS birthyear FROM cartlist WHERE orderdate BETWEEN ? AND ?";
+    "SELECT * ,YEAR(birthday) AS birthyear FROM cartlist WHERE orderdate BETWEEN ? AND ?";
     const sqlforselectedproduct = 
-    "SELECT quantity, TO_CHAR(orderdate, 'YYYY-MM-DD')AS order_month FROM cartlist WHERE productname = ? AND orderdate BETWEEN ? AND ? GROUP BY order_month"
+    "SELECT quantity, DATE_FORMAT(orderdate, '%Y-%m') AS order_month FROM cartlist WHERE productname = ? AND orderdate BETWEEN ? AND ? GROUP BY order_month"
     const sqlforgender = "SELECT SUM(gender = 'F' ) AS F ,SUM(gender = 'M' ) AS M,SUM(gender = 'O' ) AS O FROM cartlist";
     
     
