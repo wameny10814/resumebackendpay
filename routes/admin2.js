@@ -648,7 +648,7 @@ router.post('/filter', async (req, res) => {
             let thisyear = newdate.getFullYear();
 
             let ages =  rows.map(item=>{
-                return thisyear-item.birthyear*1
+                return Number(thisyear)-Number(item.birthyear*1)
             })
             let agebirdge = {};
             ages.forEach((currentage)=>{
