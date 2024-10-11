@@ -22,6 +22,7 @@
     "express": "^4.21.0",
     "express-mysql-session": "^2.1.7",
     "express-session": "^1.17.2",
+    "firebase": "^10.14.1",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^3.3.1",

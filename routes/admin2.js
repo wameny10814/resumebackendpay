@@ -74,6 +74,26 @@ router.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // 設置 
 //     res.locals.shin += ' admin2';
 //     next();
 // });
+let lastRequestTime = Date.now(); 
+
+router.use((req, res, next) => {
+    lastRequestTime = Date.now(); 
+    next(); 
+});
+
+
+setInterval(() => {
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+
+    if (timeSinceLastRequest > 10 * 60 * 1000) { 
+        console.log("喚醒");
+        res.json({
+            'message': '喚醒'
+        })
+        
+    }
+}, 10 * 60 * 1000); 
 
 router.get('/test', async (req, res) => {
     
@@ -1005,6 +1025,12 @@ router.post('/upload', upload.single('image'), (req, res) => {
 
     
 });
+
+
+
+
+
+
 
 
 

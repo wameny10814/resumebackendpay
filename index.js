@@ -45,12 +45,6 @@ app.use('/admin2',  require('./routes/admin2') );
 
 
 
-
-
-
-
-
-
 // ********** 所有路由的後面
 app.use( (req, res)=>{
     res.status(404).send(`<h2>走錯路了</h2>`);
